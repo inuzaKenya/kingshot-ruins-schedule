@@ -5241,26 +5241,45 @@ if (downloadBtn) {
       }
 
 
-      const link =
-        document.createElement(
-          "a"
-        );
+      try {
+        const fileName = `${state.date || "schedule"}.png`;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+          (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
+        if (isIOS) {
+          const dataUrl = canvas.toDataURL("image/png");
+          let preview = document.querySelector(".image-preview-modal");
+          if (!preview) {
+            preview = document.createElement("div");
+            preview.className = "image-preview-modal";
+            preview.innerHTML = `
+              <div class="image-preview-dialog" role="dialog" aria-modal="true" aria-label="PNG 预览">
+                <button type="button" class="image-preview-close" aria-label="关闭图片预览">关闭</button>
+                <img alt="作战安排 PNG 预览" />
+                <p>长按图片保存到照片或文件</p>
+              </div>`;
+            preview.addEventListener("click", event => {
+              if (event.target === preview || event.target.closest(".image-preview-close")) {
+                preview.classList.remove("is-visible");
+              }
+            });
+            document.body.appendChild(preview);
+          }
+          preview.querySelector("img").src = dataUrl;
+          preview.classList.add("is-visible");
+          showToast("图片已生成，请长按图片保存。", "success");
+          return;
+        }
 
-      link.download =
-        `${
-          state.date ||
-          "schedule"
-        }.png`;
-
-
-      link.href =
-        canvas.toDataURL(
-          "image/png"
-        );
-
-
-      link.click();
+        const dataUrl = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.download = fileName;
+        link.href = dataUrl;
+        link.click();
+      } catch (error) {
+        console.warn("PNG 导出失败。", error);
+        showToast("PNG 导出失败，请稍后重试。", "warning");
+      }
 
     }
   );
