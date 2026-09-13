@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#fff7f0">
+  <title>要塞・遗迹作战安排生成器</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <div>
+        <h1>遗迹作战安排</h1>
+        <p>编辑时间与联盟，生成适合手机分享的紧凑长图。</p>
+      </div>
+      <div class="header-actions">
+        <button id="allianceSettingsBtn" class="ghost-btn" type="button"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg></span>基础设置</button>
+        <button id="projectSettingsBtn" class="ghost-btn" type="button"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 6h14M5 12h14M5 18h14"/></svg></span>项目安排</button>
+      </div>
+    </header>
+
+    <section class="panel settings-panel modal-panel" data-modal="allianceSettings" data-modal-mode="editor" role="dialog" aria-modal="true" aria-label="基础设置">
+      <div class="section-title">
+        <div>
+          <h2>基础设置</h2>
+        </div>
+        <div class="section-actions">
+          <button id="resetBtn" class="ghost-btn danger-btn" type="button"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.3-5.7L4 8.6M4 4v4.6h4.6"/></svg></span>恢复默认</button>
+        </div>
+      </div>
+      <label class="date-field">
+        <span>作战日期</span>
+        <input id="battleDate" name="battleDate" type="date" autocomplete="off">
+      </label>
+
+      <div class="copy-settings" aria-label="图片文字设置">
+        <label>
+          <span>主标题</span>
+          <input id="titleText" name="title" type="text" maxlength="24" autocomplete="off" placeholder="遗迹作战安排">
+        </label>
+        <label>
+          <span>副标题</span>
+          <input id="subtitleText" name="subtitle" type="text" maxlength="40" autocomplete="off" placeholder="Sanctuary Battle Schedule">
+        </label>
+        <label>
+          <span>底部结尾消息</span>
+          <input id="footerText" name="footer" type="text" maxlength="30" autocomplete="off" placeholder="">
+        </label>
+        <label class="copy-setting-toggle">
+          <input id="showFooterText" name="showFooter" type="checkbox" autocomplete="off">
+          <span>显示底部结尾消息</span>
+        </label>
+      </div>
+
+      <div class="alliance-manager">
+        <div class="subhead">
+          <div>
+            <strong>联盟排序</strong>
+            <small>同一时间内按照这里的顺序排列</small>
+          </div>
+          <button id="addAllianceBtn" class="small-btn" type="button"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>添加联盟</button>
+        </div>
+        <div id="allianceList" class="alliance-list"></div>
+      </div>
+
+      <details class="time-priority-manager">
+        <summary>
+          <strong>分时段联盟优先</strong>
+          <small>设置后仅影响对应时间段</small>
+        </summary>
+        <div class="time-priority-hint">选择该时间段需要提前的联盟</div>
+        <div id="timePriorityList" class="time-priority-list"></div>
+      </details>
+      <div class="modal-footer">
+        <button class="modal-close primary-btn" type="button" data-close-modal>完成设置</button>
+      </div>
+    </section>
+
+    <section class="panel editor-panel modal-panel" data-modal="projectSettings" data-modal-mode="editor" role="dialog" aria-modal="true" aria-label="项目安排">
+      <div class="section-title">
+        <div>
+          <h2>项目安排</h2>
+        </div>
+        <div class="section-actions">
+          <button id="clearAssignmentsBtn" class="ghost-btn" type="button"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14M9 7V5h6v2m-8 0 1 13h8l1-13M10 11v4m4-4v4"/></svg></span>清空安排</button>
+        </div>
+      </div>
+
+      <div id="editorSummary" class="editor-summary" aria-live="polite"></div>
+
+      <div class="bulk-tools">
+        <div>
+          <strong>批量设置</strong>
+          <small>选择多个项目后一次性设置时间和联盟</small>
+        </div>
+        <div class="bulk-controls">
+          <select id="bulkTime" name="bulkTime" autocomplete="off"></select>
+          <select id="bulkAlliance" name="bulkAlliance" autocomplete="off"></select>
+          <button id="applyBulkBtn" class="small-btn" type="button"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></svg></span>应用</button>
+        </div>
+      </div>
+
+      <div class="project-scroll">
+        <div class="project-group">
+          <div class="group-heading" data-group-heading="fortress">
+            <h3>要塞 <span class="group-count">4</span></h3>
+            <span class="group-status" data-group-status="fortress"></span>
+            <label><input type="checkbox" data-select-group="fortress"> 全选</label>
+          </div>
+          <div id="fortressEditor" class="project-list"></div>
+        </div>
+
+        <div class="project-group">
+          <div class="group-heading" data-group-heading="ruins">
+            <h3>遗迹 <span class="group-count">12</span></h3>
+            <span class="group-status" data-group-status="ruins"></span>
+            <label><input type="checkbox" data-select-group="ruins"> 全选</label>
+          </div>
+          <div id="ruinsEditor" class="project-list"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="modal-close primary-btn" type="button" data-close-modal>完成编辑</button>
+      </div>
+    </section>
+<section class="panel output-panel" aria-label="生成结果">
+  <div class="result-status" role="status">
+    <span id="projectCount" aria-live="polite">0 项已安排</span>
+  </div>
+
+      <div class="output-actions">
+        <button id="downloadBtn" class="primary-btn" type="button" disabled><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 4v11m0 0 4-4m-4 4-4-4M5 19h14"/></svg></span>保存 PNG</button>
+        <button id="textToggle" class="ghost-btn" type="button"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 4h12v16H6zM9 8h6M9 12h6M9 16h4"/></svg></span>文字版</button>
+      </div>
+
+      <div class="preview-wrap">
+        <div id="previewEmpty" class="preview-empty">
+          <div class="empty-mark">✦</div>
+      <strong>先安排项目</strong>
+      <span>填写时间与联盟后自动生成预览。</span>
+        </div>
+        <canvas id="scheduleCanvas" class="schedule-canvas" role="img" aria-label="作战安排长图预览"></canvas>
+      </div>
+
+      <div class="text-result modal-panel" data-modal="textOutput" role="dialog" aria-modal="true" aria-label="文字版">
+        <div class="text-result-header">
+          <div>
+            <strong>文字版</strong>
+            <small>适合复制到聊天或公告</small>
+          </div>
+          <div class="text-result-actions">
+            <button id="copyBtn" class="primary-btn" type="button" disabled><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 8h10v12H8zM6 16H4V4h10v2"/></svg></span>一键复制</button>
+            <button class="modal-close ghost-btn" type="button" data-close-modal><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></span>关闭</button>
+          </div>
+        </div>
+        <div class="text-result-body">
+          <textarea id="textOutput" readonly placeholder="生成后会显示排序好的文字内容。"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <footer>本地运行 · 数据自动保存在浏览器中</footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

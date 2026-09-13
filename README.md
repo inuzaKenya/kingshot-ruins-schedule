@@ -1,1 +1,19 @@
-# kingshot-ruins-schedule
+# Kingshot Ruins Schedule
+
+Kingshot 遗迹与要塞作战安排生成器。
+
+## 功能
+
+- 按时间和联盟安排遗迹、要塞
+- 支持联盟简称、全名和旗帜
+- 支持奖励图片与奖励简称
+- 生成适合手机分享的图片和文字版
+- 设置自动保存在浏览器本地
+
+## 使用
+
+直接打开 `index.html`，完成联盟设置和项目安排后，即可保存 PNG 或复制文字版。
+
+## 技术
+
+纯 HTML、CSS、JavaScript，无需安装依赖或服务器。
