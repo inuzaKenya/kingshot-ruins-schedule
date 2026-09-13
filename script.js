@@ -1602,7 +1602,7 @@ function renderAlliances() {
               <span class="alliance-flag-status">
                 ${escapeHtml(state.allianceDetails[name]?.flagName || "上传旗帜")}
               </span>
-              <input class="alliance-flag" type="file" accept="image/*" aria-label="联盟旗帜图标（选填）" />
+              <input class="alliance-flag" type="file" aria-label="选择联盟旗帜图片文件（选填）" />
             </label>
 
             <details class="alliance-action-menu">
