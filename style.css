@@ -2967,3 +2967,85 @@ textarea:focus-visible {
     flex: 1 1 0;
   }
 }
+
+/* App data menu */
+.app-menu {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.app-menu > .ghost-btn {
+  position: relative;
+  z-index: 1;
+  border-color: transparent;
+  background: transparent;
+}
+
+.app-menu > .ghost-btn[aria-expanded="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.app-menu-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  width: 188px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+  box-shadow: 0 14px 34px rgba(74, 42, 26, 0.2);
+}
+
+.app-menu-panel[hidden] {
+  display: none;
+}
+
+.app-menu-panel button {
+  display: block;
+  width: 100%;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.app-menu-panel button:hover,
+.app-menu-panel button:focus-visible {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  outline: none;
+}
+
+.app-menu-heading {
+  padding: 7px 10px 4px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+
+.app-menu-divider {
+  height: 1px;
+  margin: 5px 4px;
+  background: var(--line);
+}
+
+@media (max-width: 600px) {
+  .app-menu-panel {
+    right: -2px;
+    width: min(188px, calc(100vw - 28px));
+  }
+
+  .app-menu-label {
+    display: none;
+  }
+}

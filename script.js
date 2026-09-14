@@ -93,8 +93,11 @@ function showUpdateBanner(version) {
   document.body.prepend(updateBanner);
 }
 
-async function checkForUpdate() {
-  if (!window.APP_VERSION || window.APP_VERSION === "__APP_VERSION__") return;
+async function checkForUpdate({ manual = false } = {}) {
+  if (!window.APP_VERSION || window.APP_VERSION === "__APP_VERSION__") {
+    if (manual) showToast("本地开发模式无需检查线上版本。", "info");
+    return;
+  }
 
   try {
     const response = await fetch(`version.json?t=${Date.now()}`, {
@@ -105,9 +108,12 @@ async function checkForUpdate() {
     const release = await response.json();
     if (release.version && release.version !== getCurrentAppVersion()) {
       showUpdateBanner(release.version);
+    } else if (manual) {
+      showToast("当前已是最新版本。", "success");
     }
   } catch {
     // 离线或暂时无法访问版本文件时保持当前页面可用。
+    if (manual) showToast("暂时无法检查版本，请稍后重试。", "warning");
   }
 }
 
@@ -116,6 +122,114 @@ window.setInterval(checkForUpdate, 5 * 60 * 1000);
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "visible") checkForUpdate();
 });
+
+function downloadJson(filename, data) {
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type: "application/json"
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+function exportAllianceConfig() {
+  downloadJson(`kingshot-alliance-config-${todayFallback()}.json`, {
+    format: "kingshot-alliance-config",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    alliances: state.alliances,
+    allianceDetails: state.allianceDetails,
+    timeAlliancePriority: state.timeAlliancePriority
+  });
+  showToast("联盟配置已导出。", "success");
+}
+
+function exportFullData() {
+  downloadJson(`kingshot-schedule-backup-${todayFallback()}.json`, {
+    format: "kingshot-schedule-backup",
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    state
+  });
+  showToast("全部数据已导出。", "success");
+}
+
+function importBackup(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const backup = JSON.parse(reader.result);
+      if (backup?.format === "kingshot-alliance-config") {
+        if (!Array.isArray(backup.alliances)) throw new Error("invalid alliance backup");
+        if (!confirm("导入联盟配置会覆盖当前联盟设置，但不会影响项目安排。是否继续？")) return;
+        state = normalizeState({
+          ...state,
+          alliances: backup.alliances,
+          allianceDetails: backup.allianceDetails,
+          timeAlliancePriority: backup.timeAlliancePriority
+        });
+      } else if (backup?.format === "kingshot-schedule-backup") {
+        if (!backup.state || typeof backup.state !== "object") throw new Error("invalid full backup");
+        if (!confirm("导入全部数据会覆盖当前日期、联盟和项目安排。是否继续？")) return;
+        state = normalizeState(backup.state);
+      } else {
+        throw new Error("unknown backup format");
+      }
+      saveState();
+      renderAll();
+      showToast("备份已恢复。", "success");
+    } catch {
+      showToast("备份文件无效或已损坏。", "warning");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function setupAppMenu() {
+  const button = document.getElementById("appMenuBtn");
+  const panel = document.getElementById("appMenuPanel");
+  const fileInput = document.getElementById("backupFileInput");
+  if (!button || !panel || !fileInput) return;
+
+  const close = () => {
+    panel.hidden = true;
+    button.setAttribute("aria-expanded", "false");
+  };
+
+  button.addEventListener("click", event => {
+    event.stopPropagation();
+    panel.hidden = !panel.hidden;
+    button.setAttribute("aria-expanded", String(!panel.hidden));
+  });
+
+  panel.addEventListener("click", event => {
+    const action = event.target.closest("[data-menu-action]")?.dataset.menuAction;
+    if (!action) return;
+    close();
+    if (action === "check-version") checkForUpdate({ manual: true });
+    if (action === "export-alliance") exportAllianceConfig();
+    if (action === "export-full") exportFullData();
+    if (action === "import") fileInput.click();
+  });
+
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files?.[0];
+    if (file) importBackup(file);
+    fileInput.value = "";
+  });
+
+  document.addEventListener("click", event => {
+    if (!event.target.closest(".app-menu")) close();
+  });
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") close();
+  });
+}
 
 
 /* =========================================================
@@ -5710,4 +5824,5 @@ function setupEditorModals() {
 }
 
 setupEditorModals();
+setupAppMenu();
 renderAll();
