@@ -3026,6 +3026,106 @@ textarea:focus-visible {
   outline: none;
 }
 
+/* Reward input mode and season/phase import controls. */
+.generation-selector {
+  align-items: flex-start;
+}
+
+.reward-input-heading {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.reward-input-controls {
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.reward-input-controls > select {
+  width: 168px;
+}
+
+.reward-auto-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 5px;
+}
+
+.reward-auto-controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.reward-auto-controls input,
+.reward-auto-controls select {
+  width: 58px;
+  height: 30px;
+  min-width: 0;
+  padding: 0 5px;
+  font-size: 10px;
+}
+
+.reward-auto-controls select {
+  width: 68px;
+}
+
+.reward-generation-hint {
+  max-width: 118px;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.2;
+}
+
+.reward-auto-controls .small-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .generation-selector {
+    display: grid;
+    gap: 7px;
+  }
+
+  .reward-input-controls,
+  .reward-auto-controls {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .reward-input-controls > select,
+  .reward-auto-controls .small-btn {
+    flex: 1 1 0;
+    width: auto;
+  }
+
+  .reward-auto-controls label {
+    flex: 1 1 0;
+    justify-content: space-between;
+  }
+
+  .reward-auto-controls input,
+  .reward-auto-controls select {
+    flex: 1 1 auto;
+    width: auto;
+  }
+
+  .reward-generation-hint {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+}
+
 .app-menu-heading {
   padding: 7px 10px 4px;
   color: var(--muted);
@@ -3047,5 +3147,120 @@ textarea:focus-visible {
 
   .app-menu-label {
     display: none;
+  }
+}
+
+/* Whole-season reward confirmation tables. */
+.season-rewards-panel {
+  width: min(980px, calc(100vw - 32px));
+}
+
+.season-rewards-summary {
+  margin: -3px 0 10px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.season-rewards-content {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.season-reward-table-wrap {
+  min-width: 410px;
+  overflow-x: auto;
+}
+
+.season-reward-table {
+  width: max-content;
+  min-width: 0;
+  margin-inline: auto;
+  border-collapse: collapse;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+.season-reward-table caption {
+  margin-bottom: 2px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.season-reward-table th {
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.season-reward-table thead th:first-child {
+  width: 30px;
+}
+
+.season-reward-table thead th:not(:first-child) {
+  width: 27px;
+  padding: 0;
+  font-size: 7px;
+  white-space: nowrap;
+}
+
+.season-reward-table tbody th {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.season-reward-cell {
+  position: relative;
+  width: 27px;
+  height: 27px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--paper-2);
+  text-align: center;
+  vertical-align: middle;
+  line-height: 0;
+  cursor: help;
+}
+
+.season-reward-cell img {
+  display: block;
+  width: 27px;
+  height: 27px;
+  margin: 0;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+.season-reward-cell span {
+  display: none;
+}
+
+.season-reward-cell.is-empty {
+  background: var(--paper);
+}
+
+.season-reward-cell.is-empty span {
+  display: block;
+  color: var(--muted);
+  padding-top: 9px;
+  font-size: 8px;
+  line-height: 1;
+}
+
+@media (max-width: 600px) {
+  .season-rewards-panel {
+    width: calc(100vw - 20px);
+  }
+
+  .season-rewards-content {
+    margin-inline: -4px;
   }
 }

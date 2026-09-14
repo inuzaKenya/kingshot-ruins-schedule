@@ -101,6 +101,7 @@
           <h2>项目安排</h2>
         </div>
         <div class="section-actions">
+          <button id="seasonRewardsBtn" class="ghost-btn" type="button"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 3v4m8-4v4M4 9h16M8 13h3m2 0h3M8 16h3m2 0h3"/></svg></span>整季奖励</button>
           <button id="clearAssignmentsBtn" class="ghost-btn" type="button"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14M9 7V5h6v2m-8 0 1 13h8l1-13M10 11v4m4-4v4"/></svg></span>清空安排</button>
         </div>
       </div>
@@ -141,6 +142,20 @@
 
       <div class="modal-footer">
         <button class="modal-close primary-btn" type="button" data-close-modal>完成编辑</button>
+      </div>
+    </section>
+
+    <section class="panel season-rewards-panel modal-panel" data-modal="seasonRewards" data-modal-mode="view" role="dialog" aria-modal="true" aria-label="整季奖励确认">
+      <div class="section-title">
+        <div>
+          <h2>整季奖励确认</h2>
+          <small>按项目编号查看第 1–8 期奖励，当前页面只读</small>
+        </div>
+      </div>
+      <div id="seasonRewardsSummary" class="season-rewards-summary" aria-live="polite"></div>
+      <div id="seasonRewardsContent" class="season-rewards-content"></div>
+      <div class="modal-footer">
+        <button class="modal-close primary-btn" type="button" data-close-modal>完成确认</button>
       </div>
     </section>
 <section class="panel output-panel" aria-label="生成结果">

@@ -237,86 +237,145 @@ function setupAppMenu() {
    ========================================================= */
 
 const REWARD_GENERATIONS = [
-
   {
-    id: "gen-2",
-    name: "第2代",
-
+    id: "all",
+    name: "全部奖励",
     rewards: [
-
-      {
-        id: "health",
-        name: "部队生命提升II(12h)",
-        shortLabel: "生命提升"
-      },
-
-      {
-        id: "zoe",
-        name: "佐伊碎片"
-      },
-
-      {
-        id: "teleporter",
-        name: "高级迁城"
-      },
-
-      {
-        id: "speedup",
-        name: "1小时通用加速",
-        shortLabel: "通用加速"
-      },
-
-      {
-        id: "damage",
-        name: "部队伤害提升II(12h)",
-        shortLabel: "伤害提升"
-      },
-
-      {
-        id: "deployment",
-        name: "出征容量提升II(12h)",
-        shortLabel: "出征提升"
-      },
-
-      {
-        id: "100xp",
-        name: "100点强化经验部件",
-        shortLabel: "装备经验"
-      },
-
-      {
-        id: "hilde",
-        name: "希尔德碎片"
-      },
-
-      {
-        id: "skill_book",
-        name: "传说技能讨伐技能书",
-        shortLabel: "讨伐技能书"
-      },
-
-      {
-        id: "skill_manual",
-        name: "传说远征技能书",
-        shortLabel: "远征技能书"
-      },
-
-      {
-        id: "10000xp",
-        name: "10000点英雄经验",
-        shortLabel: "英雄经验"
-      },
-      {
-        id: "epic_hero_shard",
-        name: "史诗英雄信物自选箱",
-        shortLabel: "紫色碎片"
-      },
+      { id: "health", name: "部队生命提升II(12h)", shortLabel: "生命提升" },
+      { id: "teleporter", name: "高级迁城" },
+      { id: "speedup", name: "1小时通用加速", shortLabel: "通用加速" },
+      { id: "damage", name: "部队伤害提升II(12h)", shortLabel: "伤害提升" },
+      { id: "deployment", name: "出征容量提升II(12h)", shortLabel: "出征提升" },
+      { id: "100xp", name: "100点强化经验部件", shortLabel: "装备经验" },
+      { id: "skill_book", name: "传说技能讨伐技能书", shortLabel: "讨伐技能书" },
+      { id: "skill_manual", name: "传说远征技能书", shortLabel: "远征技能书" },
+      { id: "10000xp", name: "10000点英雄经验", shortLabel: "英雄经验" },
+      { id: "epic_hero_shard", name: "史诗英雄信物自选箱", shortLabel: "紫色碎片" },
+      // 新英雄碎片直接追加到这里，并在 REWARD_GENERATION_HEROES 中配置代际替换。
+      { id: "jabel", name: "杰贝尔碎片" },
+      { id: "zoe", name: "佐伊碎片" },
+      { id: "hilde", name: "希尔德碎片" },
+      { id: "saul", name: "萨洛碎片" }
     ]
-
   }
-
 ];
 
+const REWARD_GENERATION_LABELS = {
+  "gen-1": "第1代",
+  "gen-2": "第2代"
+};
+
+const REWARD_SEASON_GENERATION = season => {
+  const value = Number.parseInt(season, 10);
+  if (!Number.isInteger(value) || value < 1) return null;
+  if (value <= 2) return "gen-1";
+  if (value <= 5) return "gen-2";
+  return null;
+};
+
+// 每个赛季的公共奖励模板。请在这里填写第 1–8 期的奖励顺序。
+// fortress 按数组顺序对应 1–4 号要塞，ruins 按数组顺序对应 1–12 号遗迹。
+// heroShard1 / heroShard2 会在导入时自动替换为当前奖励代的两个英雄碎片。
+const COMMON_REWARD_TEMPLATE = {
+  1: {
+    fortress: ["heroShard2", "skill_book", "skill_manual", "100xp"],
+    ruins: [
+      "heroShard1", "teleporter", "speedup", "health",
+      "heroShard1", "teleporter", "speedup", "damage",
+      "heroShard1", "teleporter", "speedup", "deployment"
+    ]
+  },
+  2: {
+    fortress: ["100xp","heroShard2", "skill_book", "skill_manual"],
+    ruins: [
+      "health", "heroShard1", "teleporter", "speedup",
+      "damage", "heroShard1", "teleporter", "speedup",
+      "deployment", "heroShard1", "teleporter", "speedup",
+    ]
+  },
+  3: {
+    fortress: ["skill_manual", "100xp","heroShard2", "skill_book"],
+    ruins: [
+      "speedup", "health", "heroShard1", "teleporter",
+      "speedup", "damage", "heroShard1", "teleporter",
+      "speedup", "deployment", "heroShard1", "teleporter",
+    ]
+  },
+  4: {
+    fortress: ["heroShard1", "skill_book", "100xp","heroShard2"],
+    ruins: [
+      "teleporter", "10000xp", "health", "skill_book",
+      "skill_manual", "speedup", "teleporter", "10000xp",
+      "damage", "skill_book", "skill_manual", "speedup",
+    ]
+  },
+  5: {
+    fortress: ["heroShard2", "skill_book", "skill_manual", "100xp"],
+    ruins: [
+      "epic_hero_shard", "10000xp", "speedup", "teleporter",
+      "epic_hero_shard", "10000xp", "speedup", "teleporter",
+      "epic_hero_shard", "10000xp", "speedup", "teleporter",
+    ]
+  },
+  6: {
+    fortress: ["100xp", "heroShard2", "skill_book", "skill_manual"],
+    ruins: [
+      "health", "epic_hero_shard", "10000xp", "speedup",
+      "damage", "epic_hero_shard", "10000xp", "speedup",
+      "deployment", "epic_hero_shard", "10000xp", "speedup",
+    ]
+  },
+  7: {
+    fortress: ["skill_manual", "100xp", "skill_book", "heroShard2"],
+    ruins: [
+      "speedup", "health", "epic_hero_shard", "10000xp",
+      "speedup", "damage", "epic_hero_shard", "10000xp",
+      "speedup", "deployment", "epic_hero_shard", "10000xp",
+    ]
+  },
+  8: {
+    fortress: ["heroShard1", "skill_manual", "100xp","heroShard2"],
+    ruins: [
+      "10000xp", "speedup", "health", "epic_hero_shard",
+      "10000xp", "speedup", "damage", "epic_hero_shard",
+      "10000xp", "speedup", "deployment", "epic_hero_shard",
+    ]
+  }
+};
+
+// 每一代的两个英雄碎片。只需修改这里的 id/name，即可让所有期数自动替换。
+const REWARD_GENERATION_HEROES = {
+  "gen-1": {
+    heroShard1: "jabel",
+    heroShard2: "saul"
+  },
+  "gen-2": {
+    heroShard1: "zoe",
+    heroShard2: "hilde"
+  }
+};
+
+function resolveTemplateRewardId(rewardId, generationId) {
+  return REWARD_GENERATION_HEROES[generationId]?.[rewardId] || rewardId;
+}
+
+function getRewardTemplate(generationId, phase) {
+  const source = COMMON_REWARD_TEMPLATE[phase];
+  if (!source || !Array.isArray(source.fortress) || !Array.isArray(source.ruins)) return null;
+  if (source.fortress.length !== 4 || source.ruins.length !== 12) return null;
+  return [
+    ...source.fortress.map((rewardId, index) => ({
+      type: "fortress",
+      number: index + 1,
+      rewardId: resolveTemplateRewardId(rewardId, generationId)
+    })),
+    ...source.ruins.map((rewardId, index) => ({
+      type: "ruins",
+      number: index + 1,
+      rewardId: resolveTemplateRewardId(rewardId, generationId)
+    }))
+  ];
+}
 
 /* =========================================================
    奖励工具
@@ -325,6 +384,14 @@ const REWARD_GENERATIONS = [
 function getGenerationById(
   generationId
 ) {
+
+  if (REWARD_GENERATION_LABELS[generationId]) {
+    return {
+      id: generationId,
+      name: REWARD_GENERATION_LABELS[generationId],
+      rewards: REWARD_GENERATIONS[0]?.rewards || []
+    };
+  }
 
   return (
     REWARD_GENERATIONS.find(
@@ -340,15 +407,7 @@ function getGenerationById(
 function getGenerationRewards(
   generationId
 ) {
-
-  const generation =
-    getGenerationById(
-      generationId
-    );
-
-  return generation
-    ? generation.rewards
-    : [];
+  return REWARD_GENERATIONS[0]?.rewards || [];
 
 }
 
@@ -446,10 +505,7 @@ function findRewardAnywhere(
    默认状态
    ========================================================= */
 
-const DEFAULT_GENERATION =
-  REWARD_GENERATIONS[0]
-    ? REWARD_GENERATIONS[0].id
-    : "";
+const DEFAULT_GENERATION = "gen-2";
 
 const DEFAULT_ALLIANCE_FLAG = "assets/default-flag.png";
 const DEFAULT_ALLIANCE_NAME = "TBD";
@@ -491,6 +547,10 @@ const defaultState = {
 
   rewardGeneration:
     DEFAULT_GENERATION,
+
+  rewardInputMode: "manual",
+  rewardSeason: "",
+  rewardPhase: "1",
 
   projects: [
 
@@ -809,6 +869,18 @@ function normalizeState(
     result.rewardGeneration =
       saved.rewardGeneration;
 
+  }
+
+  if (saved.rewardInputMode === "manual" || saved.rewardInputMode === "auto") {
+    result.rewardInputMode = saved.rewardInputMode;
+  }
+
+  if (typeof saved.rewardSeason === "string") {
+    result.rewardSeason = saved.rewardSeason.replace(/\D/g, "").slice(0, 3);
+  }
+
+  if (Number.isInteger(Number(saved.rewardPhase)) && Number(saved.rewardPhase) >= 1 && Number(saved.rewardPhase) <= 8) {
+    result.rewardPhase = String(Number(saved.rewardPhase));
   }
 
 
@@ -1272,14 +1344,23 @@ function renderGenerationOptions() {
 
 
     wrapper.innerHTML = `
-      <div>
-        <strong>奖励版本</strong>
-        <small>
-          选择本次使用的奖励代
-        </small>
+      <div class="reward-input-heading">
+        <strong>奖励录入方式</strong>
+        <small>可手动逐项选择，或按赛季与期数套用整期模板</small>
       </div>
-
-      <select id="rewardGeneration"></select>
+      <div class="reward-input-controls">
+        <select id="rewardInputMode" aria-label="奖励录入方式">
+          <option value="manual">手动录入</option>
+          <option value="auto">按赛季与期数自动导入</option>
+        </select>
+        <div id="rewardAutoControls" class="reward-auto-controls" hidden>
+          <label>赛季 <input id="rewardSeason" type="number" min="1" max="999" step="1" inputmode="numeric" placeholder="1"></label>
+          <label>期数 <select id="rewardPhase" aria-label="奖励期数">${Array.from({ length: 8 }, (_, i) => `<option value="${i + 1}">第${i + 1}期</option>`).join("")}</select></label>
+          <span id="rewardGenerationHint" class="reward-generation-hint" aria-live="polite"></span>
+          <button id="importRewardTemplateBtn" class="small-btn" type="button">导入本期奖励</button>
+        </div>
+      </div>
+      <select id="rewardGeneration" hidden aria-hidden="true"></select>
     `;
 
 
@@ -1367,6 +1448,78 @@ function renderGenerationOptions() {
 /* =========================================================
    奖励区域样式
    ========================================================= */
+
+function syncRewardInputControls() {
+  const wrapper = $(".generation-selector");
+  if (!wrapper) return;
+  const mode = wrapper.querySelector("#rewardInputMode");
+  const season = wrapper.querySelector("#rewardSeason");
+  const phase = wrapper.querySelector("#rewardPhase");
+  const controls = wrapper.querySelector("#rewardAutoControls");
+  const hint = wrapper.querySelector("#rewardGenerationHint");
+  const button = wrapper.querySelector("#importRewardTemplateBtn");
+  if (!mode || !season || !phase || !controls || !hint || !button) return;
+
+  mode.value = state.rewardInputMode;
+  season.value = state.rewardSeason;
+  phase.value = state.rewardPhase;
+  const generationId = REWARD_SEASON_GENERATION(season.value);
+  const hasTemplate = Boolean(generationId && getRewardTemplate(generationId, Number(phase.value)));
+  controls.hidden = mode.value !== "auto";
+  hint.textContent = mode.value !== "auto"
+    ? ""
+    : generationId
+      ? `将使用${getGenerationById(generationId)?.name}奖励`
+      : "该赛季暂无内置模板，请手动录入";
+  button.disabled = !hasTemplate;
+}
+
+function importRewardTemplate() {
+  const season = Number.parseInt($("#rewardSeason")?.value, 10);
+  const phase = Number.parseInt($("#rewardPhase")?.value, 10);
+  const generationId = REWARD_SEASON_GENERATION(season);
+  const template = generationId ? getRewardTemplate(generationId, phase) : null;
+  if (!template) {
+    showToast("该赛季暂无内置奖励模板，请改用手动录入。", "warning");
+    return;
+  }
+  if (!confirm(`导入第${season}赛季第${phase}期奖励将覆盖当前16个项目的奖励，是否继续？`)) return;
+
+  const rewardByProject = new Map(template.map(item => [`${item.type}-${item.number}`, item.rewardId]));
+  state.rewardInputMode = "auto";
+  state.rewardSeason = String(season);
+  state.rewardPhase = String(phase);
+  state.rewardGeneration = generationId;
+  state.projects.forEach(project => {
+    project.rewardId = rewardByProject.get(`${project.type}-${project.number}`) || "";
+  });
+  saveState();
+  renderProjects();
+  updateOutput();
+  syncRewardInputControls();
+  showToast(`已导入第${season}赛季第${phase}期奖励，可继续手动修正。`, "success");
+}
+
+document.addEventListener("change", event => {
+  if (!event.target.closest(".generation-selector")) return;
+  if (event.target.id === "rewardInputMode") state.rewardInputMode = event.target.value;
+  if (event.target.id === "rewardPhase") state.rewardPhase = event.target.value;
+  if (event.target.id === "rewardSeason") state.rewardSeason = event.target.value;
+  saveState();
+  syncRewardInputControls();
+});
+
+document.addEventListener("click", event => {
+  if (event.target.closest("#importRewardTemplateBtn")) importRewardTemplate();
+});
+
+document.addEventListener("input", event => {
+  if (event.target.id !== "rewardSeason") return;
+  state.rewardSeason = event.target.value.replace(/\D/g, "").slice(0, 3);
+  event.target.value = state.rewardSeason;
+  saveState();
+  syncRewardInputControls();
+});
 
 function injectRewardStyles() {
 
@@ -3512,6 +3665,15 @@ function compactProjectLabel(project) {
   return `${project.number}号${project.type === "fortress" ? "要塞" : "遗迹"}`;
 }
 
+function getRewardPeriodLabel() {
+  const season = Number.parseInt(state.rewardSeason, 10);
+  const phase = Number.parseInt(state.rewardPhase, 10);
+  if (!Number.isInteger(season) || season < 1 || !Number.isInteger(phase) || phase < 1 || phase > 8) {
+    return "";
+  }
+  return `第${season}赛季 ${phase}/8期`;
+}
+
 function getTimeAllianceGroups(projects) {
   return TIMES.map(time => {
     const items = projects.filter(project => project.time === time);
@@ -3798,9 +3960,13 @@ async function drawUserFirstSchedule(canvas, projects, version) {
 
   const titleX = left + 42;
   const dateText = state.date || todayFallback();
+  const periodText = getRewardPeriodLabel();
   ctx.font = "600 14px -apple-system, BlinkMacSystemFont, 'Noto Sans SC', sans-serif";
   const dateWidth = ctx.measureText(dateText).width;
+  ctx.font = "600 11px -apple-system, BlinkMacSystemFont, 'Noto Sans SC', sans-serif";
+  const periodWidth = periodText ? ctx.measureText(periodText).width : 0;
   const titleMaxWidth = Math.max(96, right - titleX - dateWidth - 14);
+  const subtitleMaxWidth = Math.max(96, right - titleX - periodWidth - 14);
 
   ctx.textAlign = "left";
   ctx.fillStyle = "#4a2a1a";
@@ -3808,10 +3974,15 @@ async function drawUserFirstSchedule(canvas, projects, version) {
   drawLeftEllipsisText(ctx, state.title || "遗迹・要塞作战安排", titleX, 23, titleMaxWidth);
   ctx.fillStyle = "#8c614e";
   ctx.font = "700 8px -apple-system, BlinkMacSystemFont, 'Noto Sans SC', sans-serif";
-  drawLeftEllipsisText(ctx, state.subtitle || "", titleX, 43, titleMaxWidth);
+  drawLeftEllipsisText(ctx, state.subtitle || "", titleX, 43, subtitleMaxWidth);
   ctx.textAlign = "right";
   ctx.font = "600 14px -apple-system, BlinkMacSystemFont, 'Noto Sans SC', sans-serif";
   ctx.fillText(dateText, right, 23);
+  if (periodText) {
+    ctx.fillStyle = "#8c614e";
+    ctx.font = "600 11px -apple-system, BlinkMacSystemFont, 'Noto Sans SC', sans-serif";
+    ctx.fillText(periodText, right, 43);
+  }
   ctx.fillStyle = "#f0d8c5";
   ctx.fillRect(left, 57, width, 1);
 
@@ -5103,6 +5274,8 @@ function generateText() {
   const groups = getTimeAllianceGroups(getSortedProjects());
   const groupedLines = [state.title || "遗迹・要塞作战安排"];
   if (state.subtitle) groupedLines.push(state.subtitle);
+  const periodText = getRewardPeriodLabel();
+  if (periodText) groupedLines.push(periodText);
   groupedLines.push("");
 
   groups.forEach(group => {
@@ -5123,6 +5296,50 @@ function generateText() {
 
   return groupedLines.join("\n").trim();
 
+}
+
+function renderRewardMatrix(type, count, generationId) {
+  const typeName = type === "fortress" ? "要塞" : "遗迹";
+  const rows = Array.from({ length: count }, (_, index) => {
+    const number = index + 1;
+    const cells = Array.from({ length: 8 }, (_, phaseIndex) => {
+      const template = getRewardTemplate(generationId, phaseIndex + 1);
+      const item = template?.find(entry => entry.type === type && entry.number === number);
+      const reward = item ? getRewardById(item.rewardId, generationId) : null;
+      if (!reward) {
+        return `<td class="season-reward-cell is-empty"><span>待配置</span></td>`;
+      }
+      return `
+        <td class="season-reward-cell" title="${escapeHtml(reward.name)}">
+          <img src="${escapeHtml(rewardImagePath(reward.id))}" alt="${escapeHtml(reward.name)}" loading="lazy" />
+          <span>${escapeHtml(getRewardDisplayName(reward))}</span>
+        </td>`;
+    }).join("");
+    return `<tr><th scope="row">${number}</th>${cells}</tr>`;
+  }).join("");
+
+  return `
+    <div class="season-reward-table-wrap">
+      <table class="season-reward-table">
+        <caption>${typeName}奖励</caption>
+        <thead><tr><th scope="col">${typeName}</th>${Array.from({ length: 8 }, (_, i) => `<th scope="col">P${i + 1}</th>`).join("")}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function renderSeasonRewards() {
+  const content = $("#seasonRewardsContent");
+  const summary = $("#seasonRewardsSummary");
+  if (!content || !summary) return;
+
+  const season = Number.parseInt(state.rewardSeason, 10);
+  const generationId = REWARD_SEASON_GENERATION(state.rewardSeason) || state.rewardGeneration;
+  const generation = getGenerationById(generationId);
+  summary.textContent = Number.isInteger(season) && season > 0
+    ? `第${season}赛季 · ${generation?.name || "未识别奖励代"} · 共 8 期`
+    : "尚未选择赛季；请先在项目安排中输入赛季，表格将按当前奖励配置预览。";
+  content.innerHTML = `${renderRewardMatrix("ruins", 12, generationId)}${renderRewardMatrix("fortress", 4, generationId)}`;
 }
 
 /* =========================================================
@@ -5661,6 +5878,7 @@ function renderAll() {
    * 奖励版本
    */
   renderGenerationOptions();
+  syncRewardInputControls();
 
 
   /*
@@ -5698,6 +5916,7 @@ function setupEditorModals() {
   const openers = {
     allianceSettingsBtn: "allianceSettings",
     projectSettingsBtn: "projectSettings",
+    seasonRewardsBtn: "seasonRewards",
     textToggle: "textOutput"
   };
 
@@ -5762,6 +5981,7 @@ function setupEditorModals() {
       event.stopPropagation();
       activeOpener = button;
       const isEditor = panel.dataset.modalMode === "editor";
+      if (modalName === "seasonRewards") renderSeasonRewards();
       if (isEditor) {
         modalEditSnapshot = JSON.stringify(state);
       }
