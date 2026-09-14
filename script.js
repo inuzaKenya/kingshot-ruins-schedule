@@ -117,6 +117,11 @@ const REWARD_GENERATIONS = [
         name: "10000点英雄经验",
         shortLabel: "英雄经验"
       },
+      {
+        id: "epic_hero_shard",
+        name: "史诗英雄信物自选箱",
+        shortLabel: "紫色碎片"
+      },
     ]
 
   }
