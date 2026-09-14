@@ -42,6 +42,81 @@ function showToast(message, tone = "info") {
   }, 1800);
 }
 
+/* =========================================================
+   应用版本检查
+   ========================================================= */
+
+let updateBanner = null;
+let dismissedUpdateVersion = null;
+
+function getCurrentAppVersion() {
+  if (window.APP_VERSION !== "__APP_VERSION__") {
+    return window.APP_VERSION;
+  }
+
+  return new URLSearchParams(window.location.search).get("v") || "local-dev";
+}
+
+function showUpdateBanner(version) {
+  if (
+    updateBanner ||
+    dismissedUpdateVersion === version ||
+    version === getCurrentAppVersion()
+  ) return;
+
+  updateBanner = document.createElement("div");
+  updateBanner.className = "update-banner";
+  updateBanner.setAttribute("role", "status");
+  updateBanner.innerHTML = `
+    <span class="update-banner-message">发现新版本，更新后可使用最新内容。</span>
+    <span class="update-banner-actions">
+      <button type="button" class="ghost-btn update-later-btn">稍后</button>
+      <button type="button" class="primary-btn update-now-btn">立即更新</button>
+    </span>
+  `;
+
+  updateBanner.querySelector(".update-later-btn").addEventListener("click", () => {
+    dismissedUpdateVersion = version;
+    updateBanner.remove();
+    updateBanner = null;
+  });
+
+  updateBanner.querySelector(".update-now-btn").addEventListener("click", () => {
+    if (!confirm("确认现在更新页面吗？当前设置会保留。")) return;
+    saveState();
+    const url = new URL(window.location.href);
+    url.searchParams.set("v", version);
+    url.searchParams.set("reload", Date.now().toString());
+    window.location.replace(url.toString());
+  });
+
+  document.body.prepend(updateBanner);
+}
+
+async function checkForUpdate() {
+  if (!window.APP_VERSION || window.APP_VERSION === "__APP_VERSION__") return;
+
+  try {
+    const response = await fetch(`version.json?t=${Date.now()}`, {
+      cache: "no-store"
+    });
+    if (!response.ok) return;
+
+    const release = await response.json();
+    if (release.version && release.version !== getCurrentAppVersion()) {
+      showUpdateBanner(release.version);
+    }
+  } catch {
+    // 离线或暂时无法访问版本文件时保持当前页面可用。
+  }
+}
+
+checkForUpdate();
+window.setInterval(checkForUpdate, 5 * 60 * 1000);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") checkForUpdate();
+});
+
 
 /* =========================================================
    奖励数据

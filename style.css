@@ -2911,3 +2911,59 @@ textarea:focus-visible {
     font-size: 9px !important;
   }
 }
+.update-banner {
+  position: relative;
+  z-index: 2;
+  width: min(calc(100% - 24px), 720px);
+  margin: 12px auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 12px;
+  border: 1px solid rgba(126, 73, 38, 0.2);
+  border-radius: 14px;
+  background: #fff7f0;
+  box-shadow: 0 8px 24px rgba(72, 39, 20, 0.16);
+  color: #482714;
+  font-size: 0.9rem;
+}
+
+.update-banner-message {
+  flex: 1 1 220px;
+}
+
+.update-banner-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+}
+
+.update-banner .ghost-btn,
+.update-banner .primary-btn {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 7px 12px;
+}
+
+@media (max-width: 420px) {
+  .update-banner {
+    align-items: stretch;
+  }
+
+  .update-banner-message {
+    flex-basis: 100%;
+  }
+
+  .update-banner-actions {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .update-banner-actions .ghost-btn,
+  .update-banner-actions .primary-btn {
+    flex: 1 1 0;
+  }
+}
